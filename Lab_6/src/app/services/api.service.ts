@@ -5,17 +5,16 @@ import { Book, Genre, Lending, Stats } from '../models/book.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  // Point this at your PHP backend
   private base = '/api';
 
   constructor(private http: HttpClient) {}
 
-  // ── STATS ──────────────────────────────────────────────────────────────
+  // stats
   getStats(): Observable<Stats> {
     return this.http.get<Stats>(`${this.base}/stats.php`);
   }
 
-  // ── BOOKS ──────────────────────────────────────────────────────────────
+  // books
   getBooks(genreId?: number | string, search?: string): Observable<{ books: Book[] }> {
     let params = new HttpParams();
     if (genreId) params = params.set('genre_id', genreId.toString());
@@ -35,7 +34,7 @@ export class ApiService {
     return this.http.delete<any>(`${this.base}/books.php`, { params: { id: id.toString() } });
   }
 
-  // ── GENRES ─────────────────────────────────────────────────────────────
+  // genres
   getGenres(): Observable<{ genres: Genre[] }> {
     return this.http.get<{ genres: Genre[] }>(`${this.base}/genres.php`);
   }
@@ -52,7 +51,7 @@ export class ApiService {
     return this.http.delete<any>(`${this.base}/genres.php`, { params: { id: id.toString() } });
   }
 
-  // ── LENDINGS ───────────────────────────────────────────────────────────
+  // lendings
   getLendings(activeOnly = false): Observable<{ lendings: Lending[] }> {
     let params = new HttpParams();
     if (activeOnly) params = params.set('active', '1');
