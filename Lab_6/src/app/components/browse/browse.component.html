@@ -4,7 +4,6 @@
 <app-alert #alertRef></app-alert>
 <app-confirm-dialog #confirmRef></app-confirm-dialog>
 
-<!-- Stats Bar -->
 <div class="stats-bar">
   <div class="stat-card">
     <div class="stat-num">{{ stats.total_books }}</div>
@@ -24,7 +23,6 @@
   </div>
 </div>
 
-<!-- Filter Bar -->
 <div class="filter-bar">
   <label>Filter</label>
   <div class="search-box">
@@ -41,7 +39,7 @@
   </span>
 </div>
 
-<!-- Books Grid -->
+<!-- books grid -->
 <div *ngIf="loading" class="loading-wrap">
   <div class="spinner"></div><span>Loading your library…</span>
 </div>
@@ -67,7 +65,7 @@
   </div>
 </div>
 
-<!-- Book Detail / Edit Modal -->
+<!-- book detail / edit modal -->
 <div *ngIf="selectedBook" class="modal-overlay" (click)="closeAll()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -75,7 +73,7 @@
       <button class="modal-close" (click)="closeAll()">✕</button>
     </div>
 
-    <!-- Detail View -->
+    <!-- detailed view -->
     <div *ngIf="!editMode" class="modal-body">
       <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
         <div class="mini-cover" [ngStyle]="coverStyle(selectedBook.cover_color)">
@@ -96,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Edit View -->
+    <!-- edit view -->
     <div *ngIf="editMode" class="modal-body">
       <form class="form-grid" (ngSubmit)="saveEdit()">
         <div class="form-group">
@@ -154,7 +152,7 @@
   </div>
 </div>
 
-<!-- Lend Modal -->
+<!-- lend modal -->
 <div *ngIf="lendBookId" class="modal-overlay" (click)="closeAll()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">

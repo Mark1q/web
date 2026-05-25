@@ -6,7 +6,7 @@
 
 <div class="genres-layout">
 
-  <!-- Add Genre Panel -->
+  <!-- add genre panel -->
   <div class="card">
     <h2 class="panel-title">Add Genre</h2>
     <div class="form-group" style="margin-bottom:1rem">
@@ -18,7 +18,7 @@
     <button class="btn btn-primary" style="width:100%" (click)="addGenre()">+ Add Genre</button>
   </div>
 
-  <!-- Genre List Panel -->
+  <!--genre list panel -->
   <div>
     <div class="filter-bar" style="margin-bottom:1rem">
       <label>Search</label>
@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<!-- Edit Modal -->
+<!-- edit modal -->
 <div *ngIf="editGenre" class="modal-overlay" (click)="closeEdit()">
   <div class="modal" style="max-width:400px" (click)="$event.stopPropagation()">
     <div class="modal-header">
