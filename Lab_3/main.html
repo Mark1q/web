@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./main.css">
+    <script src="./main.js"></script>
+    <title>Lab 3</title>
+</head>
+<body>
+    <div class="container">
+        <div class="main-input">
+            <fieldset>
+                <legend id="field-legend">Array Sorter</legend>
+                <div class="arr-input">
+                    <label for="arr-input">Array: </label>
+                    <input type="text" name="num-array" alt="array-number-input" 
+                    id="arr-input" placeholder="ex. 1, 2, 3, ...">
+                    <button id="arr-button" onclick="fun()">Submit</button>
+                </div>
+                <p>Ascending sorted numbers below.</p>
+                <table class="array-table">
+                    <thead>
+                        <tr>
+                            <th id="col-1">Col 1</th>
+                            <th id="col-2">Col 2</th>
+                            <th id="col-3">Col 3</th>
+                            <th id="col-4">Col 4</th>
+                            <th id="col-5">Col 5</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+div .desktop {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5rem;
+    color: white;
+    cursor: pointer; 
+}
+
+.desktop:nth-child(1) { background-color: #264653;}
+.desktop:nth-child(2) { background-color: #2a9d8f;}
+.desktop:nth-child(3) { background-color: #e9c46a;}
+.desktop:nth-child(4) { background-color: #f4a261;}
+

@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.main-input {
+    width: 500px;
+}
+
+.array-table {
+    margin-top: 20px;
+    border: 1px solid black;
+}
+
+.array-table th, .array-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.arr-input {
+    display: flex;
+    gap: 10px;
+}
+
+#arr-button {
+    width: 60px;
+    text-align: center;
+}
