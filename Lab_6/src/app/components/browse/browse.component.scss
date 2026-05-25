@@ -1,0 +1,57 @@
+.filter-memory {
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-family: 'Crimson Pro', serif;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity var(--transition);
+  &:hover { opacity: 1; text-decoration: underline; }
+}
+
+.mini-cover {
+  width: 80px;
+  height: 120px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.9);
+  text-align: center;
+  padding: 0.5rem;
+  position: relative;
+
+  .spine {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 8px;
+    background: rgba(0,0,0,0.25);
+  }
+}
+
+.detail-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+.detail-author { font-style: italic; color: var(--muted); margin-bottom: 0.75rem; }
+.detail-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.9rem;
+  color: var(--slate);
+}
+.detail-desc { margin-top: 0.75rem; font-size: 0.95rem; color: var(--slate); }
+
+.color-preview {
+  padding: 0.4rem 1rem;
+  border-radius: 3px;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.8rem;
+  transition: background var(--transition);
+}

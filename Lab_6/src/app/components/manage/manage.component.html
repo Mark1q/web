@@ -1,0 +1,119 @@
+<h1 class="page-title">Manage Books</h1>
+<p class="page-subtitle">Edit or remove books from your library</p>
+
+<app-alert #alertRef></app-alert>
+<app-confirm-dialog #confirmRef></app-confirm-dialog>
+
+<div class="filter-bar" style="margin-bottom:1rem">
+  <label>Search</label>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" [ngModel]="searchValue" (ngModelChange)="onSearch($event)" placeholder="Search by title, author…">
+  </div>
+  <label>Genre</label>
+  <select [(ngModel)]="genreFilter" (ngModelChange)="onGenreChange()">
+    <option value="">All Genres</option>
+    <option *ngFor="let g of genres" [value]="g.id">{{ g.name }}</option>
+  </select>
+  <a routerLink="/add" class="btn btn-primary btn-sm">+ Add Book</a>
+</div>
+
+<div *ngIf="loading" class="loading-wrap">
+  <div class="spinner"></div> Loading…
+</div>
+
+<div *ngIf="!loading && books.length === 0" class="empty-state">
+  <div class="empty-icon">📭</div><p>No books found.</p>
+</div>
+
+<div *ngIf="!loading && books.length > 0" class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Book</th><th>Genre</th><th>Pages</th><th>Year</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let b of books">
+        <td>
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <div class="mini-cover" [ngStyle]="{background: b.cover_color}"></div>
+            <div>
+              <div style="font-weight:600;font-family:'Playfair Display',serif">{{ b.title }}</div>
+              <div style="font-size:0.82rem;color:var(--muted);font-style:italic">{{ b.author }}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="genre-tag">{{ b.genre_name || '—' }}</span></td>
+        <td>{{ b.pages || '—' }}</td>
+        <td>{{ b.published_year || '—' }}</td>
+        <td>
+          <span *ngIf="b.is_lent" class="book-badge lent">Lent</span>
+          <span *ngIf="!b.is_lent" class="book-badge" style="background:var(--forest)">In shelf</span>
+        </td>
+        <td class="td-actions">
+          <button class="btn btn-primary btn-sm" (click)="openEdit(b)">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteBook(b.id, b.title)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Edit Modal -->
+<div *ngIf="editBook" class="modal-overlay" (click)="closeEdit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">✏️ Edit Book</span>
+      <button class="modal-close" (click)="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form class="form-grid">
+        <div class="form-group">
+          <label>Title *</label>
+          <input [(ngModel)]="editData.title" name="title" [class.ng-invalid]="editErrors['title']">
+          <span *ngIf="editErrors['title']" class="error-msg">{{ editErrors['title'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Author *</label>
+          <input [(ngModel)]="editData.author" name="author" [class.ng-invalid]="editErrors['author']">
+          <span *ngIf="editErrors['author']" class="error-msg">{{ editErrors['author'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select [(ngModel)]="editData.genre_id" name="genre_id">
+            <option [ngValue]="null">— None —</option>
+            <option *ngFor="let g of genres" [ngValue]="g.id">{{ g.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pages</label>
+          <input type="number" [(ngModel)]="editData.pages" name="pages" min="1">
+        </div>
+        <div class="form-group">
+          <label>Published Year</label>
+          <input type="number" [(ngModel)]="editData.published_year" name="published_year" [max]="today()">
+        </div>
+        <div class="form-group">
+          <label>ISBN</label>
+          <input [(ngModel)]="editData.isbn" name="isbn">
+        </div>
+        <div class="form-group full">
+          <label>Cover Color</label>
+          <div class="color-row">
+            <input type="color" [(ngModel)]="editData.cover_color" name="cover_color">
+            <span class="color-preview" [ngStyle]="{background: editData.cover_color}">{{ editData.title }}</span>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea [(ngModel)]="editData.description" name="description"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeEdit()">Cancel</button>
+      <button class="btn btn-primary" (click)="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>

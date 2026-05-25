@@ -1,0 +1,25 @@
+.cover-preview {
+  height: 80px;
+  width: 56px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.9);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--transition);
+
+  .spine {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: rgba(0,0,0,0.25);
+  }
+}
+
+input.ng-invalid { border-color: var(--burgundy) !important; }

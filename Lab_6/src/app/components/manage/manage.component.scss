@@ -1,0 +1,14 @@
+.mini-cover {
+  width: 28px;
+  height: 40px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.color-preview {
+  padding: 0.4rem 1rem;
+  border-radius: 3px;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.8rem;
+}
+input.ng-invalid { border-color: var(--burgundy) !important; }

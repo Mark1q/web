@@ -1,0 +1,111 @@
+<h1 class="page-title">Book Lendings</h1>
+<p class="page-subtitle">Track who has borrowed your books</p>
+
+<app-alert #alertRef></app-alert>
+<app-confirm-dialog #confirmRef></app-confirm-dialog>
+
+<div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap">
+  <div style="display:flex;gap:0.5rem">
+    <button class="btn btn-sm" [class.btn-primary]="activeTab==='active'" [class.btn-ghost]="activeTab!=='active'"
+            (click)="switchTab('active')">📤 Currently Out</button>
+    <button class="btn btn-sm" [class.btn-primary]="activeTab==='all'" [class.btn-ghost]="activeTab!=='all'"
+            (click)="switchTab('all')">📋 All History</button>
+  </div>
+  <button class="btn btn-forest btn-sm" (click)="openNew()" style="margin-left:auto">+ New Lending</button>
+</div>
+
+<div *ngIf="loading" class="loading-wrap"><div class="spinner"></div> Loading…</div>
+
+<div *ngIf="!loading && lendings.length === 0" class="empty-state">
+  <div class="empty-icon">{{ activeTab === 'active' ? '📚' : '📋' }}</div>
+  <p>{{ activeTab === 'active' ? 'No books currently lent out.' : 'No lending history yet.' }}</p>
+</div>
+
+<div *ngIf="!loading && lendings.length > 0" class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Book</th><th>Borrower</th><th>Lent</th><th>Due</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of lendings">
+        <td>
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <div class="mini-cover" [ngStyle]="{background: l.cover_color}"></div>
+            <div>
+              <div style="font-weight:600;font-family:'Playfair Display',serif;font-size:0.95rem">{{ l.title }}</div>
+              <div style="font-size:0.8rem;color:var(--muted);font-style:italic">{{ l.author }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="font-weight:600">{{ l.borrower_name }}</div>
+          <div *ngIf="l.borrower_contact" style="font-size:0.8rem;color:var(--muted)">{{ l.borrower_contact }}</div>
+        </td>
+        <td>{{ l.lent_date }}</td>
+        <td [style.color]="isOverdue(l) ? 'var(--burgundy)' : ''" [style.fontWeight]="isOverdue(l) ? '600' : 'normal'">
+          {{ l.due_date || '—' }}
+        </td>
+        <td>
+          <span class="status-dot" [class.active]="!l.returned_date" [class.returned]="!!l.returned_date"></span>
+          <span [style.color]="isOverdue(l) ? 'var(--burgundy)' : ''">
+            {{ l.returned_date ? 'Returned ' + l.returned_date : isOverdue(l) ? '⚠ Overdue' : 'Out' }}
+          </span>
+        </td>
+        <td class="td-actions">
+          <button *ngIf="!l.returned_date" class="btn btn-forest btn-sm" (click)="markReturned(l.id)">✓ Returned</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteLending(l.id)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- New Lending Modal -->
+<div *ngIf="showNewModal" class="modal-overlay" (click)="closeNew()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">📤 New Lending</span>
+      <button class="modal-close" (click)="closeNew()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form class="form-grid" novalidate>
+        <div class="form-group full">
+          <label>Book *</label>
+          <select [(ngModel)]="lendForm.book_id" name="book_id" [class.ng-invalid]="lendErrors['book_id']">
+            <option value="">— Select a book —</option>
+            <option *ngFor="let b of books" [value]="b.id">{{ b.title }} — {{ b.author }}</option>
+          </select>
+          <span *ngIf="lendErrors['book_id']" class="error-msg">{{ lendErrors['book_id'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Borrower Name *</label>
+          <input [(ngModel)]="lendForm.borrower_name" name="borrower_name" placeholder="Full name"
+                 [class.ng-invalid]="lendErrors['borrower_name']">
+          <span *ngIf="lendErrors['borrower_name']" class="error-msg">{{ lendErrors['borrower_name'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Contact (email/phone)</label>
+          <input [(ngModel)]="lendForm.borrower_contact" name="borrower_contact" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <label>Lent Date *</label>
+          <input type="date" [(ngModel)]="lendForm.lent_date" name="lent_date"
+                 [class.ng-invalid]="lendErrors['lent_date']">
+          <span *ngIf="lendErrors['lent_date']" class="error-msg">{{ lendErrors['lent_date'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" [(ngModel)]="lendForm.due_date" name="due_date">
+        </div>
+        <div class="form-group full">
+          <label>Notes</label>
+          <textarea [(ngModel)]="lendForm.notes" name="notes" placeholder="Any notes about this lending…"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeNew()">Cancel</button>
+      <button class="btn btn-forest" (click)="submitLend()">📤 Record Lending</button>
+    </div>
+  </div>
+</div>

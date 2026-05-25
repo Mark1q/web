@@ -1,0 +1,19 @@
+.genres-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+  color: var(--ink);
+}
+
+input.ng-invalid { border-color: var(--burgundy) !important; }

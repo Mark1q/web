@@ -1,0 +1,75 @@
+<h1 class="page-title">Add a New Book</h1>
+<p class="page-subtitle">Expand your collection</p>
+
+<app-alert #alertRef></app-alert>
+
+<div class="card" style="max-width:720px">
+  <form class="form-grid" (ngSubmit)="submit()" novalidate>
+
+    <div class="form-group">
+      <label>Title *</label>
+      <input [(ngModel)]="form.title" name="title" placeholder="e.g. The Name of the Wind"
+             [class.ng-invalid]="errors['title']">
+      <span *ngIf="errors['title']" class="error-msg">{{ errors['title'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Author *</label>
+      <input [(ngModel)]="form.author" name="author" placeholder="e.g. Patrick Rothfuss"
+             [class.ng-invalid]="errors['author']">
+      <span *ngIf="errors['author']" class="error-msg">{{ errors['author'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Genre</label>
+      <select [(ngModel)]="form.genre_id" name="genre_id">
+        <option value="">— Select genre —</option>
+        <option *ngFor="let g of genres" [value]="g.id">{{ g.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Number of Pages</label>
+      <input type="number" [(ngModel)]="form.pages" name="pages" min="1" placeholder="e.g. 662"
+             [class.ng-invalid]="errors['pages']">
+      <span *ngIf="errors['pages']" class="error-msg">{{ errors['pages'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>Published Year</label>
+      <input type="number" [(ngModel)]="form.published_year" name="published_year"
+             min="1000" [max]="today()" placeholder="e.g. 2007"
+             [class.ng-invalid]="errors['published_year']">
+      <span *ngIf="errors['published_year']" class="error-msg">{{ errors['published_year'] }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>ISBN</label>
+      <input [(ngModel)]="form.isbn" name="isbn" placeholder="e.g. 978-0756404741">
+    </div>
+
+    <div class="form-group full">
+      <label>Cover Color</label>
+      <div class="color-row">
+        <input type="color" [(ngModel)]="form.cover_color" name="cover_color">
+        <div class="cover-preview" [ngStyle]="{background: form.cover_color}">
+          <span class="spine"></span>
+          {{ previewTitle }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group full">
+      <label>Description / Notes</label>
+      <textarea [(ngModel)]="form.description" name="description" placeholder="Brief synopsis or personal notes…"></textarea>
+    </div>
+
+  </form>
+  <hr>
+  <div style="display:flex;gap:1rem;justify-content:flex-end">
+    <a routerLink="/browse" class="btn btn-ghost">Cancel</a>
+    <button class="btn btn-primary" (click)="submit()" [disabled]="saving">
+      {{ saving ? 'Saving…' : '📚 Add Book' }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,195 @@
+<h1 class="page-title">Browse Your Library</h1>
+<p class="page-subtitle">Explore your collection by genre or search</p>
+
+<app-alert #alertRef></app-alert>
+<app-confirm-dialog #confirmRef></app-confirm-dialog>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-num">{{ stats.total_books }}</div>
+    <div class="stat-label">Total Books</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{{ stats.lent_out }}</div>
+    <div class="stat-label">Lent Out</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{{ stats.genres }}</div>
+    <div class="stat-label">Genres</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:var(--burgundy)">{{ stats.overdue }}</div>
+    <div class="stat-label">Overdue</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <label>Filter</label>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" [ngModel]="searchValue" (ngModelChange)="onSearch($event)" placeholder="Search title, author, ISBN…">
+  </div>
+  <label>Genre</label>
+  <select [(ngModel)]="genreFilter" (ngModelChange)="onGenreChange()">
+    <option value="">All Genres</option>
+    <option *ngFor="let g of genres" [value]="g.id">{{ g.name }}</option>
+  </select>
+  <span *ngIf="lastFilterLabel" class="filter-memory" (click)="clearLastFilter()" title="Click to dismiss">
+    {{ lastFilterLabel }}
+  </span>
+</div>
+
+<!-- Books Grid -->
+<div *ngIf="loading" class="loading-wrap">
+  <div class="spinner"></div><span>Loading your library…</span>
+</div>
+
+<div *ngIf="!loading && books.length === 0" class="empty-state">
+  <div class="empty-icon">📭</div>
+  <p>No books found. Try a different filter or <a routerLink="/add">add one</a>.</p>
+</div>
+
+<div *ngIf="!loading && books.length > 0" class="books-grid">
+  <div class="book-card" *ngFor="let book of books" (click)="openDetail(book)">
+    <div class="book-cover" [ngStyle]="coverStyle(book.cover_color)">{{ book.title }}</div>
+    <div class="book-info">
+      <div class="book-title">{{ book.title }}</div>
+      <div class="book-author">by {{ book.author }}</div>
+      <div class="book-meta">
+        {{ book.published_year || '' }}
+        {{ book.pages ? '· ' + book.pages + ' pp' : '' }}
+      </div>
+      <span *ngIf="book.genre_name" class="genre-tag">{{ book.genre_name }}</span>
+      <span *ngIf="book.is_lent" class="book-badge lent">Lent Out</span>
+    </div>
+  </div>
+</div>
+
+<!-- Book Detail / Edit Modal -->
+<div *ngIf="selectedBook" class="modal-overlay" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ editMode ? '✏️ Edit Book' : '📖 Book Details' }}</span>
+      <button class="modal-close" (click)="closeAll()">✕</button>
+    </div>
+
+    <!-- Detail View -->
+    <div *ngIf="!editMode" class="modal-body">
+      <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
+        <div class="mini-cover" [ngStyle]="coverStyle(selectedBook.cover_color)">
+          <span class="spine"></span>{{ selectedBook.title }}
+        </div>
+        <div style="flex:1;min-width:200px">
+          <h2 class="detail-title">{{ selectedBook.title }}</h2>
+          <p class="detail-author">by {{ selectedBook.author }}</p>
+          <div class="detail-meta">
+            <div *ngIf="selectedBook.genre_name"><strong>Genre:</strong> {{ selectedBook.genre_name }}</div>
+            <div *ngIf="selectedBook.pages"><strong>Pages:</strong> {{ selectedBook.pages }}</div>
+            <div *ngIf="selectedBook.published_year"><strong>Year:</strong> {{ selectedBook.published_year }}</div>
+            <div *ngIf="selectedBook.isbn"><strong>ISBN:</strong> {{ selectedBook.isbn }}</div>
+          </div>
+          <p *ngIf="selectedBook.description" class="detail-desc">{{ selectedBook.description }}</p>
+          <span *ngIf="selectedBook.is_lent" class="book-badge lent" style="margin-top:0.5rem">Currently Lent Out</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit View -->
+    <div *ngIf="editMode" class="modal-body">
+      <form class="form-grid" (ngSubmit)="saveEdit()">
+        <div class="form-group">
+          <label>Title *</label>
+          <input [(ngModel)]="editData.title" name="title" required [class.ng-invalid]="editErrors['title']">
+          <span *ngIf="editErrors['title']" class="error-msg">{{ editErrors['title'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Author *</label>
+          <input [(ngModel)]="editData.author" name="author" required [class.ng-invalid]="editErrors['author']">
+          <span *ngIf="editErrors['author']" class="error-msg">{{ editErrors['author'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select [(ngModel)]="editData.genre_id" name="genre_id">
+            <option [ngValue]="null">— None —</option>
+            <option *ngFor="let g of genres" [ngValue]="g.id">{{ g.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pages</label>
+          <input type="number" [(ngModel)]="editData.pages" name="pages" min="1">
+        </div>
+        <div class="form-group">
+          <label>Published Year</label>
+          <input type="number" [(ngModel)]="editData.published_year" name="published_year" min="1000" [max]="today()">
+        </div>
+        <div class="form-group">
+          <label>ISBN</label>
+          <input [(ngModel)]="editData.isbn" name="isbn">
+        </div>
+        <div class="form-group full">
+          <label>Cover Color</label>
+          <div class="color-row">
+            <input type="color" [(ngModel)]="editData.cover_color" name="cover_color">
+            <span class="color-preview" [ngStyle]="coverStyle(editData.cover_color || '#4a6fa5')">{{ editData.title }}</span>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea [(ngModel)]="editData.description" name="description"></textarea>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeAll()">{{ editMode ? 'Cancel' : 'Close' }}</button>
+      <ng-container *ngIf="!editMode">
+        <button *ngIf="!selectedBook.is_lent" class="btn btn-forest" (click)="openLend(selectedBook.id)">📤 Lend</button>
+        <button class="btn btn-primary" (click)="openEdit(selectedBook)">✏️ Edit</button>
+        <button class="btn btn-danger" (click)="deleteBook(selectedBook)">🗑 Delete</button>
+      </ng-container>
+      <button *ngIf="editMode" class="btn btn-primary" (click)="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lend Modal -->
+<div *ngIf="lendBookId" class="modal-overlay" (click)="closeAll()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">📤 Lend This Book</span>
+      <button class="modal-close" (click)="closeAll()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form class="form-grid">
+        <div class="form-group">
+          <label>Borrower Name *</label>
+          <input [(ngModel)]="lendForm.borrower_name" name="borrower_name" placeholder="Full name" [class.ng-invalid]="lendErrors['borrower_name']">
+          <span *ngIf="lendErrors['borrower_name']" class="error-msg">{{ lendErrors['borrower_name'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Contact (email/phone)</label>
+          <input [(ngModel)]="lendForm.borrower_contact" name="borrower_contact" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <label>Lent Date *</label>
+          <input type="date" [(ngModel)]="lendForm.lent_date" name="lent_date" [class.ng-invalid]="lendErrors['lent_date']">
+          <span *ngIf="lendErrors['lent_date']" class="error-msg">{{ lendErrors['lent_date'] }}</span>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" [(ngModel)]="lendForm.due_date" name="due_date">
+        </div>
+        <div class="form-group full">
+          <label>Notes</label>
+          <textarea [(ngModel)]="lendForm.notes" name="notes" placeholder="Any notes…"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeAll()">Cancel</button>
+      <button class="btn btn-forest" (click)="submitLend()">📤 Lend Book</button>
+    </div>
+  </div>
+</div>
